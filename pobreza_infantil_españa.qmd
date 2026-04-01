@@ -1,0 +1,170 @@
+---
+title: "Pobreza y exclusión social en la infancia española"
+subtitle: "Análisis de la tasa AROPE infantil con microdatos de la ECV 2024"
+author: "Lorena Marcos"
+date: today
+lang: es
+format:
+  html:
+    toc: true
+    toc-title: "Contenido"
+    toc-float: true
+    toc-depth: 3
+    theme: flatly
+    highlight-style: tango
+    code-fold: true
+    code-summary: "Ver código"
+    df-print: kable
+    self-contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+------------------------------------------------------------------------
+
+## Introducción
+
+España es uno de los países de la Unión Europea con mayor desigualdad en la distribución de la renta, y la infancia concentra una parte desproporcionada de esa desigualdad. El indicador AROPE (*At Risk Of Poverty or Social Exclusion*), utilizado por Eurostat para el seguimiento de los objetivos de la Agenda 2030, integra tres dimensiones complementarias: riesgo de pobreza relativa, privación material severa y baja intensidad laboral en el hogar.
+
+Este análisis explora la situación de la **población infantil española** (menores de 16 años) a través de cuatro dimensiones:
+
+-   Tasa AROPE infantil en el contexto europeo
+-   Influencia del régimen de tenencia de la vivienda
+-   Composición del hogar como factor de vulnerabilidad
+-   Privación alimentaria y pobreza energética
+
+**Fuente de datos:** Encuesta de Condiciones de Vida (ECV) 2024, elaborada por el INE. Se utilizan microdatos a nivel de persona con ponderación mediante el factor `RB050`, que corrige el diseño muestral complejo de la encuesta.
+
+------------------------------------------------------------------------
+
+## Preparación de datos
+
+```{r carga}
+library(Hmisc)
+library(dplyr)
+library(tidyverse)
+
+load("ECVpersona.RData")
+
+# Variable dicotómica de población infantil (menores de 16 años, según RB081)
+ECVpersona <- ECVpersona |>
+  mutate(menores = ifelse(RB081 < 16, 1, 0))
+```
+
+La variable `menores` toma valor 1 para personas menores de 16 años y 0 para el resto, en línea con la definición metodológica de Eurostat para el indicador AROPE.
+
+------------------------------------------------------------------------
+
+## 1. Tasa AROPE infantil en España
+
+El primer análisis contrasta la tasa AROPE de la población infantil española con el referente europeo. En 2024, Bulgaria presentaba la tasa más elevada de la UE entre los países con datos disponibles, con un **34,3%**.
+
+```{r arope-infantil}
+ECVpersona |>
+  group_by(menores) |>
+  summarise(
+    personas_AROPE  = sum(RB050[vrEU2030_nuevo == 1]),
+    total_personas  = sum(RB050),
+    tasa_AROPE      = round(personas_AROPE / total_personas * 100, 2)
+  )
+```
+
+**Interpretación:** La tasa AROPE infantil en España supera el 34,3% de Bulgaria, lo que confirma que el titular no es *fake news*: España se sitúa entre los países europeos con mayor riesgo de pobreza o exclusión social en la infancia. Este dato resulta llamativo en el contexto de un país con un nivel de renta medio-alto dentro de la UE, y apunta a una distribución de la renta especialmente regresiva en los tramos inferiores, donde se concentran los hogares con niños.
+
+------------------------------------------------------------------------
+
+## 2. Tasa AROPE infantil según régimen de tenencia de la vivienda
+
+El acceso a la vivienda es uno de los determinantes estructurales más relevantes de la pobreza. Los hogares en régimen de alquiler dedican una proporción mayor de su renta disponible a este gasto, lo que comprime el margen para cubrir otras necesidades básicas.
+
+```{r arope-tenencia}
+ECVpersona |>
+  filter(menores == 1) |>
+  group_by(ARRENDATARIO) |>
+  summarise(
+    personas_AROPE  = sum(RB050[vrEU2030_nuevo == 1]),
+    total_personas  = sum(RB050),
+    tasa_AROPE      = round(personas_AROPE / total_personas * 100, 2)
+  )
+```
+
+**Interpretación:** Los niños que viven en hogares arrendatarios presentan una tasa AROPE notablemente superior a los que residen en viviendas en propiedad u otros regímenes. Esta brecha refleja la situación de vulnerabilidad específica de los hogares que alquilan: mayor inestabilidad residencial, menor capacidad de ahorro y mayor exposición a subidas de renta. En el contexto del mercado inmobiliario español de 2024, con precios de alquiler en máximos históricos en las principales ciudades, este diferencial tiene una lectura especialmente preocupante.
+
+------------------------------------------------------------------------
+
+## 3. Tasa AROPE infantil según composición del hogar
+
+La estructura del hogar determina tanto los ingresos disponibles como las necesidades de gasto. Los hogares monoparentales y los numerosos son teóricamente los más expuestos: los primeros por depender de un único sustentador, los segundos por la presión que ejerce un mayor número de hijos sobre la renta per cápita del hogar.
+
+```{r arope-tiphogar}
+ECVpersona |>
+  filter(menores == 1, TIPHOGAR != 8) |>   # Se excluye cat. 8: composición no identificada
+  group_by(TIPHOGAR) |>
+  summarise(
+    personas_AROPE  = sum(RB050[vrEU2030_nuevo == 1]),
+    total_personas  = sum(RB050),
+    tasa_AROPE      = round(personas_AROPE / total_personas * 100, 2)
+  ) |>
+  arrange(desc(tasa_AROPE))
+```
+
+**Interpretación:** Los dos tipos de hogar con mayor tasa AROPE infantil son el **Tipo 3** (un adulto con al menos un niño, es decir, hogares monoparentales) y el **Tipo 6** (dos adultos con tres o más niños). Ambos patrones responden a lógicas distintas pero convergentes:
+
+-   En los hogares monoparentales, la ausencia de un segundo sustentador limita estructuralmente la capacidad de generación de ingresos, al tiempo que las responsabilidades de cuidado restringen la disponibilidad para trabajar a tiempo completo.
+-   En los hogares numerosos, la dilución de la renta entre un mayor número de miembros hace que incluso ingresos laborales relativamente estables resulten insuficientes para superar el umbral de pobreza relativa.
+
+Ambos perfiles son consistentes con la evidencia comparada europea y señalan la importancia de políticas de transferencia directa orientadas específicamente a estos tipos de hogar.
+
+------------------------------------------------------------------------
+
+## 4. Privación alimentaria en la infancia
+
+La privación alimentaria —medida aquí como la incapacidad de permitirse una comida proteica (carne, pollo o pescado) al menos cada dos días— es uno de los indicadores de privación material más directamente vinculados al bienestar infantil.
+
+```{r privacion-alimentaria}
+ECVpersona |>
+  filter(menores == 1) |>                  # Filtro corregido: solo población infantil
+  group_by(ARRENDATARIO) |>
+  summarise(
+    porcentaje = round(weighted.mean(HS050 == 1, RB050, na.rm = TRUE) * 100, 2)
+  )
+```
+
+**Interpretación:** Los niños en hogares arrendatarios presentan un porcentaje de privación alimentaria superior al de los no arrendatarios. Esta diferencia es coherente con el patrón observado en la tasa AROPE: los hogares que alquilan tienen menos renta disponible una vez cubierto el coste de la vivienda, lo que se traduce en restricciones concretas sobre la alimentación. La variable `HS050` captura una forma de privación que va más allá del umbral de pobreza relativa y refleja carencias materiales efectivas en el día a día de los menores.
+
+------------------------------------------------------------------------
+
+## 5. Pobreza energética en la infancia
+
+La pobreza energética —la incapacidad de mantener la vivienda a una temperatura adecuada— tiene consecuencias directas sobre la salud y el desarrollo infantil, especialmente durante los meses de invierno.
+
+```{r pobreza-energetica}
+ECVpersona |>
+  filter(menores == 1) |>                  # Filtro corregido: solo población infantil
+  group_by(ARRENDATARIO) |>
+  summarise(
+    porcentaje = round(weighted.mean(HS040 == 1, RB050, na.rm = TRUE) * 100, 2)
+  )
+```
+
+**Interpretación:** En este caso, el resultado presenta un patrón diferente al observado en la privación alimentaria: los hogares **no arrendatarios** con niños muestran un porcentaje de pobreza energética superior. Este resultado, aparentemente contraintuitivo, puede explicarse por la composición del parque de viviendas en propiedad en España: una parte significativa de la vivienda en propiedad es antigua, con baja eficiencia energética y sin sistemas de calefacción central, especialmente en zonas rurales y en hogares de renta baja que accedieron a la propiedad en décadas anteriores. Los hogares arrendatarios, en cambio, tienden a concentrarse en áreas urbanas con viviendas más recientes o mejor acondicionadas. Este resultado subraya la importancia de no reducir la vulnerabilidad energética únicamente al régimen de tenencia, sino de considerar también la calidad y antigüedad del parque residencial.
+
+------------------------------------------------------------------------
+
+## Conclusiones
+
+Este análisis evidencia que la pobreza infantil en España es un fenómeno multidimensional con patrones territoriales, estructurales y de composición del hogar claramente identificables:
+
+1.  **La tasa AROPE infantil española es de las más elevadas de la UE**, lo que contrasta con el nivel de desarrollo económico del país y apunta a una distribución de la renta especialmente desfavorable para los hogares con niños.
+
+2.  **El régimen de alquiler amplifica el riesgo de pobreza infantil**, tanto en términos de AROPE como de privación alimentaria, en un contexto de tensión extrema en el mercado inmobiliario.
+
+3.  **Los hogares monoparentales y los numerosos concentran las tasas más altas**, lo que señala targets prioritarios para políticas de transferencia y apoyo al cuidado.
+
+4.  **La pobreza energética sigue una lógica parcialmente distinta**, condicionada por la calidad del parque residencial y no solo por el régimen de tenencia, lo que requiere políticas específicas de rehabilitación y eficiencia energética.
+
+------------------------------------------------------------------------
+
+*Análisis realizado con microdatos de la ECV 2024 (INE). Ponderaciones aplicadas mediante el factor de elevación `RB050`.*
