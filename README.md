@@ -1,16 +1,16 @@
-# 👶 Pobreza y exclusión social en la infancia española
+# Pobreza y exclusión social en la infancia española
 
 Análisis de la tasa AROPE infantil en España a partir de microdatos de la **Encuesta de Condiciones de Vida (ECV) 2024** del INE.
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
 Explorar la situación de la población infantil española (menores de 16 años) en términos de pobreza y exclusión social, identificando los perfiles de hogar más vulnerables y contrastando el dato español con el contexto europeo.
 
 ---
 
-## 🔍 Dimensiones analizadas
+## Dimensiones analizadas
 
 - **Tasa AROPE infantil en España** y comparación con el máximo europeo (Bulgaria, 34,3%)
 - **Régimen de tenencia de la vivienda** — arrendatarios vs. no arrendatarios
@@ -20,7 +20,7 @@ Explorar la situación de la población infantil española (menores de 16 años)
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 pobreza-infantil-espana/
@@ -31,11 +31,10 @@ pobreza-infantil-espana/
 └── README.md
 ```
 
-> *Los microdatos de la ECV no se distribuyen en este repositorio por restricciones de licencia del INE. Pueden descargarse gratuitamente desde [ine.es](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736176807&menu=resultados&idp=1254735976608).
 
 ---
 
-## 📊 Fuente de datos
+## Fuente de datos
 
 | Campo | Detalle |
 |---|---|
@@ -47,7 +46,7 @@ pobreza-infantil-espana/
 
 ---
 
-## 🧮 Variables clave
+## Variables clave
 
 | Variable | Descripción |
 |---|---|
@@ -61,7 +60,7 @@ pobreza-infantil-espana/
 
 ---
 
-## 📦 Requisitos
+## Requisitos
 
 ```r
 install.packages(c("tidyverse", "dplyr", "Hmisc"))
@@ -71,7 +70,7 @@ R versión ≥ 4.0 y Quarto ≥ 1.3 recomendados.
 
 ---
 
-## ▶️ Cómo ejecutar
+## Cómo ejecutar
 
 1. Descarga los microdatos ECV 2024 del INE y guarda el archivo como `ECVpersona.RData` en la raíz del proyecto
 2. Abre `pobreza_infantil_españa.qmd` en RStudio
@@ -79,7 +78,7 @@ R versión ≥ 4.0 y Quarto ≥ 1.3 recomendados.
 
 ---
 
-## 📌 Principales hallazgos
+## Principales hallazgos
 
 - La tasa AROPE infantil en España **supera el máximo europeo** registrado por Bulgaria (34,3%), situándola entre las más elevadas de la UE
 - Los niños en **hogares arrendatarios** presentan tasas de AROPE y privación alimentaria notablemente superiores
