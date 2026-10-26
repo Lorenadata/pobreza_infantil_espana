@@ -1,90 +1,68 @@
-# Pobreza y exclusión social en la infancia española
+# Child Poverty and Social Exclusion in Spain
 
-Análisis de la tasa AROPE infantil en España a partir de microdatos de la **Encuesta de Condiciones de Vida (ECV) 2024** del INE.
+[![Report](https://img.shields.io/badge/report-live-2ea44f)](https://lorenadata.github.io/pobreza_infantil_espana/)
+![R](https://img.shields.io/badge/R-276DC3?logo=r&logoColor=white)
+![Quarto](https://img.shields.io/badge/Quarto-75AADB?logo=quarto&logoColor=white)
 
----
+Survey-weighted analysis of the **AROPE** indicator (*At Risk Of Poverty or Social Exclusion*) for children under 16 in Spain, using official microdata from the INE **Survey on Income and Living Conditions (ECV 2024)**.
 
-## Objetivo
-
-Explorar la situación de la población infantil española (menores de 16 años) en términos de pobreza y exclusión social, identificando los perfiles de hogar más vulnerables y contrastando el dato español con el contexto europeo.
-
----
-
-## Dimensiones analizadas
-
-- **Tasa AROPE infantil en España** y comparación con el máximo europeo (Bulgaria, 34,3%)
-- **Régimen de tenencia de la vivienda** — arrendatarios vs. no arrendatarios
-- **Composición del hogar** — hogares monoparentales y numerosos como factores de riesgo
-- **Privación alimentaria** — incapacidad de costear proteína animal cada dos días
-- **Pobreza energética** — incapacidad de mantener la vivienda a temperatura adecuada
+**📄 Full report (Spanish):** https://lorenadata.github.io/pobreza_infantil_espana/
 
 ---
 
-## Estructura del proyecto
+## Question
+
+Is it true that child poverty in Spain is among the highest in the EU — and which households carry most of that risk?
+
+## Key findings
+
+| | AROPE rate |
+|---|---|
+| Children under 16 | **34.7%** |
+| Rest of the population | 24.3% |
+
+- The child AROPE rate is **10 points higher** than for the rest of the population, and above the 34.3% registered by Bulgaria, the highest in the EU among countries with available data.
+- Children in **rented homes** show markedly higher AROPE and food deprivation rates.
+- **Single-parent households** and **large families (3+ children)** concentrate the highest risk.
+- **Energy poverty** follows a different pattern: it hits owner-occupied homes harder, likely driven by the age and low energy efficiency of the Spanish housing stock.
+
+## Methodology
+
+- Unit of analysis: individuals, weighted with the population expansion factor `RB050`, so every rate is a population estimate rather than a raw sample proportion.
+- Children defined as under 16 (`RB081`), following the Eurostat AROPE definition.
+- Dimensions: housing tenure, household type, food deprivation and energy poverty.
+
+| Variable | Meaning |
+|---|---|
+| `RB081` | Age |
+| `RB050` | Population weight |
+| `vrEU2030_nuevo` | AROPE indicator (EU 2030 definition) |
+| `ARRENDATARIO` | Housing tenure: tenant / non-tenant |
+| `TIPHOGAR` | Household type |
+| `HS050` | Can't afford a protein meal every second day |
+| `HS040` | Can't keep the home adequately warm |
+
+## Repository structure
 
 ```
-pobreza-infantil-espana/
-│
-├── pobreza_infantil_españa.qmd    # Análisis principal (Quarto)
-├── pobreza_infantil_españa.html   # Informe renderizado (GitHub Pages)
-├── ECVpersona.RData               # Microdatos ECV 2024 — no incluidos en el repo*
-└── README.md
+.
+├── pobreza_infantil_espana.qmd   # Analysis source (Quarto)
+├── index.html                    # Rendered report, served by GitHub Pages
+└── ECVpersona.RData              # ECV 2024 person-level microdata (INE)
 ```
 
-
----
-
-## Fuente de datos
-
-| Campo | Detalle |
-|---|---|
-| Encuesta | Encuesta de Condiciones de Vida (ECV) |
-| Edición | 2024 |
-| Organismo | Instituto Nacional de Estadística (INE) |
-| Nivel | Microdatos de persona |
-| Ponderación | Factor de elevación `RB050` |
-
----
-
-## Variables clave
-
-| Variable | Descripción |
-|---|---|
-| `RB081` | Edad de la persona |
-| `RB050` | Factor de ponderación muestral |
-| `vrEU2030_nuevo` | Indicador AROPE (At Risk Of Poverty or Social Exclusion) |
-| `ARRENDATARIO` | Régimen de tenencia: arrendatario / no arrendatario |
-| `TIPHOGAR` | Tipo de hogar según composición |
-| `HS050` | Privación alimentaria (comida proteica cada 2 días) |
-| `HS040` | Pobreza energética (temperatura adecuada en el hogar) |
-
----
-
-## Requisitos
+## Reproduce
 
 ```r
-install.packages(c("tidyverse", "dplyr", "Hmisc"))
+install.packages(c("tidyverse", "Hmisc"))
 ```
 
-R versión ≥ 4.0 y Quarto ≥ 1.3 recomendados.
+Open `pobreza_infantil_espana.qmd` in RStudio and click **Render** (R ≥ 4.0, Quarto ≥ 1.3). The microdata file is included; it can also be downloaded from the [INE microdata portal](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736176807&menu=resultados&idp=1254735976608).
+
+## Data source
+
+Instituto Nacional de Estadística (INE), *Encuesta de Condiciones de Vida 2024*, person-level microdata. Data © INE, reused under its open-data terms.
 
 ---
 
-## Cómo ejecutar
-
-1. Descarga los microdatos ECV 2024 del INE y guarda el archivo como `ECVpersona.RData` en la raíz del proyecto
-2. Abre `pobreza_infantil_españa.qmd` en RStudio
-3. Haz clic en **Render** para generar el informe HTML
-
----
-
-## Principales hallazgos
-
-- La tasa AROPE infantil en España **supera el máximo europeo** registrado por Bulgaria (34,3%), situándola entre las más elevadas de la UE
-- Los niños en **hogares arrendatarios** presentan tasas de AROPE y privación alimentaria notablemente superiores
-- Los **hogares monoparentales** (Tipo 3) y los **hogares numerosos con 3+ hijos** (Tipo 6) concentran el mayor riesgo de pobreza infantil
-- La **pobreza energética** sigue una lógica distinta: afecta más a hogares en propiedad, condicionada por la antigüedad y eficiencia del parque residencial español
-
----
-
-*Parte de mi portfolio de análisis de datos sociales con microdatos oficiales.*
+**Lorena Marcos** · Applied Data Science, Universidad Complutense de Madrid · [LinkedIn](https://www.linkedin.com/in/lorena-marcos-6516272b5/) · [GitHub](https://github.com/Lorenadata)
