@@ -22,6 +22,11 @@ format:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
+::: callout-note
+## Nota de corrección (octubre de 2026)
+La primera versión de este informe codificaba mal dos indicadores de privación. Para la privación alimentaria usaba `HS050 == 1`, que en la ECV significa *sí puede permitírselo*, en lugar de `HS050 == 2`. Para la pobreza energética usaba `HS040`, que mide la capacidad de irse de vacaciones, en lugar de `HH050` (capacidad de mantener la vivienda a una temperatura adecuada). Las secciones 4 y 5 y las conclusiones están corregidas. La conclusión sobre pobreza energética se invierte: afecta más a los niños en hogares de alquiler. Las tasas AROPE no cambian.
+:::
+
 ------------------------------------------------------------------------
 
 ## Introducción
@@ -33,7 +38,7 @@ Este análisis explora la situación de la **población infantil española** (me
 -   Tasa AROPE infantil en el contexto europeo
 -   Influencia del régimen de tenencia de la vivienda
 -   Composición del hogar como factor de vulnerabilidad
--   Privación alimentaria y pobreza energética
+-   Privación alimentaria (`HS050`) y pobreza energética (`HH050`)
 
 **Fuente de datos:** Encuesta de Condiciones de Vida (ECV) 2024, elaborada por el INE. Se utilizan microdatos a nivel de persona con ponderación mediante el factor `RB050`, que corrige el diseño muestral complejo de la encuesta.
 
@@ -128,11 +133,11 @@ ECVpersona |>
   filter(menores == 1) |>                  # Filtro corregido: solo población infantil
   group_by(ARRENDATARIO) |>
   summarise(
-    porcentaje = round(weighted.mean(HS050 == 1, RB050, na.rm = TRUE) * 100, 2)
+    porcentaje = round(weighted.mean(HS050 == 2, RB050, na.rm = TRUE) * 100, 2)   # 2 = no puede permitírselo
   )
 ```
 
-**Interpretación:** Los niños en hogares arrendatarios presentan un porcentaje de privación alimentaria superior al de los no arrendatarios. Esta diferencia es coherente con el patrón observado en la tasa AROPE: los hogares que alquilan tienen menos renta disponible una vez cubierto el coste de la vivienda, lo que se traduce en restricciones concretas sobre la alimentación. La variable `HS050` captura una forma de privación que va más allá del umbral de pobreza relativa y refleja carencias materiales efectivas en el día a día de los menores.
+**Interpretación:** El 12,9 % de los niños en hogares arrendatarios vive en un hogar que no puede permitirse una comida proteica cada dos días, frente al 4,2 % en el resto: tres veces más. Esta diferencia es coherente con el patrón observado en la tasa AROPE: los hogares que alquilan tienen menos renta disponible una vez cubierto el coste de la vivienda, lo que se traduce en restricciones concretas sobre la alimentación. La variable `HS050` captura una forma de privación que va más allá del umbral de pobreza relativa y refleja carencias materiales efectivas en el día a día de los menores.
 
 ------------------------------------------------------------------------
 
@@ -145,11 +150,11 @@ ECVpersona |>
   filter(menores == 1) |>                  # Filtro corregido: solo población infantil
   group_by(ARRENDATARIO) |>
   summarise(
-    porcentaje = round(weighted.mean(HS040 == 1, RB050, na.rm = TRUE) * 100, 2)
+    porcentaje = round(weighted.mean(HH050 == 2, RB050, na.rm = TRUE) * 100, 2)   # HH050: temperatura adecuada; 2 = no puede
   )
 ```
 
-**Interpretación:** En este caso, el resultado presenta un patrón diferente al observado en la privación alimentaria: los hogares **no arrendatarios** con niños muestran un porcentaje de pobreza energética superior. Este resultado, aparentemente contraintuitivo, puede explicarse por la composición del parque de viviendas en propiedad en España: una parte significativa de la vivienda en propiedad es antigua, con baja eficiencia energética y sin sistemas de calefacción central, especialmente en zonas rurales y en hogares de renta baja que accedieron a la propiedad en décadas anteriores. Los hogares arrendatarios, en cambio, tienden a concentrarse en áreas urbanas con viviendas más recientes o mejor acondicionadas. Este resultado subraya la importancia de no reducir la vulnerabilidad energética únicamente al régimen de tenencia, sino de considerar también la calidad y antigüedad del parque residencial.
+**Interpretación:** El 29,3 % de los niños en hogares arrendatarios vive en una casa que no puede mantener a una temperatura adecuada, frente al 12,7 % en el resto. La pobreza energética sigue el mismo patrón que la privación alimentaria y la tasa AROPE, y con una brecha aún mayor: el alquiler concentra todas las formas de privación analizadas. Que afecte a casi uno de cada tres niños que viven de alquiler sugiere un problema doble: menos renta disponible y, posiblemente, viviendas en alquiler peor aisladas en las que el inquilino no puede invertir (una hipótesis que estos datos no permiten contrastar).
 
 ------------------------------------------------------------------------
 
@@ -159,11 +164,11 @@ Este análisis evidencia que la pobreza infantil en España es un fenómeno mult
 
 1.  **La tasa AROPE infantil española es de las más elevadas de la UE**, lo que contrasta con el nivel de desarrollo económico del país y apunta a una distribución de la renta especialmente desfavorable para los hogares con niños.
 
-2.  **El régimen de alquiler amplifica el riesgo de pobreza infantil**, tanto en términos de AROPE como de privación alimentaria, en un contexto de tensión extrema en el mercado inmobiliario.
+2.  **El régimen de alquiler amplifica el riesgo de pobreza infantil** en todas las dimensiones analizadas: AROPE, privación alimentaria (12,9 % frente a 4,2 %) y pobreza energética (29,3 % frente a 12,7 %), en un contexto de tensión extrema en el mercado inmobiliario.
 
 3.  **Los hogares monoparentales y los numerosos concentran las tasas más altas**, lo que señala targets prioritarios para políticas de transferencia y apoyo al cuidado.
 
-4.  **La pobreza energética sigue una lógica parcialmente distinta**, condicionada por la calidad del parque residencial y no solo por el régimen de tenencia, lo que requiere políticas específicas de rehabilitación y eficiencia energética.
+4.  **La pobreza energética golpea con especial fuerza a los niños que viven de alquiler**, lo que apunta a la necesidad de combinar ayudas a la renta con políticas de rehabilitación y eficiencia energética del parque en alquiler.
 
 ------------------------------------------------------------------------
 

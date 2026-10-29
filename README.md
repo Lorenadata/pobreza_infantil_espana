@@ -22,9 +22,10 @@ Is it true that child poverty in Spain is among the highest in the EU — and wh
 | Rest of the population | 24.3% |
 
 - The child AROPE rate is **10 points higher** than for the rest of the population, and above the 34.3% registered by Bulgaria, the highest in the EU among countries with available data.
-- Children in **rented homes** show markedly higher AROPE and food deprivation rates.
+- Renting concentrates every form of deprivation analysed: among children in **rented homes**, 12.9% live in a household that can't afford a protein meal every second day (vs 4.2%), and 29.3% in a home that can't be kept adequately warm (vs 12.7%).
 - **Single-parent households** and **large families (3+ children)** concentrate the highest risk.
-- **Energy poverty** follows a different pattern: it hits owner-occupied homes harder, likely driven by the age and low energy efficiency of the Spanish housing stock.
+
+> **Correction (October 2026).** The first version of this report coded two deprivation indicators wrongly (`HS050 == 1` and `HS040` instead of `HS050 == 2` and `HH050`), which reversed the energy-poverty finding. The report and this README are corrected; AROPE rates are unaffected.
 
 ## Methodology
 
@@ -39,8 +40,8 @@ Is it true that child poverty in Spain is among the highest in the EU — and wh
 | `vrEU2030_nuevo` | AROPE indicator (EU 2030 definition) |
 | `ARRENDATARIO` | Housing tenure: tenant / non-tenant |
 | `TIPHOGAR` | Household type |
-| `HS050` | Can't afford a protein meal every second day |
-| `HS040` | Can't keep the home adequately warm |
+| `HS050` | Can afford a protein meal every second day (2 = no) |
+| `HH050` | Can keep the home adequately warm (2 = no) |
 
 ## Repository structure
 
